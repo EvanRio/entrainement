@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Object Questions Trainer</title>
+
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  background: linear-gradient(135deg,#667eea,#764ba2);
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
+}
+
+.container {
+  background:white;
+  border-radius:20px;
+  box-shadow:0 20px 60px rgba(0,0,0,.3);
+  max-width:700px;
+  width:100%;
+  padding:40px;
+}
+
+h1 {
+  text-align:center;
+  color:#667eea;
+  margin-bottom:10px;
+}
+
+.score {
+  text-align:center;
+  color:#666;
+  margin-bottom:25px;
+}
+
+.score span {
+  font-weight:bold;
+  color:#667eea;
+}
+
+.card {
+  background:#f8f9ff;
+  border-radius:15px;
+  padding:30px;
+  border:2px solid #e0e7ff;
+  margin-bottom:20px;
+}
+
+.sentence {
+  text-align:center;
+  font-size:1.6em;
+  color:#764ba2;
+  font-weight:bold;
+  margin-bottom:20px;
+}
+
+input {
+  width:100%;
+  padding:14px;
+  border:2px solid #e0e7ff;
+  border-radius:10px;
+  font-size:1.1em;
+  font-family:monospace;
+}
+
+input:focus {
+  outline:none;
+  border-color:#667eea;
+}
+
+input.correct { border-color:#10b981; background:#ecfdf5; }
+input.incorrect { border-color:#ef4444; background:#fef2f2; }
+
+button {
+  width:100%;
+  padding:14px;
+  background:linear-gradient(135deg,#667eea,#764ba2);
+  color:white;
+  border:none;
+  border-radius:10px;
+  font-size:1.1em;
+  font-weight:bold;
+  cursor:pointer;
+  margin-top:15px;
+}
+
+button:hover {
+  transform:translateY(-2px);
+  box-shadow:0 5px 20px rgba(102,126,234,.4);
+}
+
+.result {
+  margin-top:15px;
+  padding:15px;
+  border-radius:10px;
+  font-weight:bold;
+  text-align:center;
+}
+
+.correctBox { background:#ecfdf5; color:#10b981; }
+.incorrectBox { background:#fef2f2; color:#ef4444; }
+
+.correction {
+  margin-top:10px;
+  font-weight:normal;
+}
+
+.pdf-link{
+ display:block;
+ margin-top:10px;
+ font-size:0.9em;
+ color:#667eea;
+ text-decoration:underline;
+ justify-content: center;
+ align-items: center;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>🎯 Object Questions Trainer</h1>
+  <div class="score">Score : <span id="good">0</span> / <span id="total">0</span></div>
+
+  <div class="card">
+    <div class="sentence" id="sentence"></div>
+    <input id="answer" placeholder="Tape la question ici puis Entrée…">
+    <button onclick="check()">Vérifier</button>
+    <div id="result"></div>
+  </div>
+  <a class="pdf-link" href="objectcour.pdf" target="_blank">📄 S'entraîner avec le PDF cours</a>
+</div>
+
+<script>
+const data = [
+ {s:"Julie loves ice cream", a:"what does julie love?"},
+ {s:"Tom eats pizza", a:"what does tom eat?"},
+ {s:"She watches TV", a:"what does she watch?"},
+ {s:"They play football", a:"what do they play?"},
+ {s:"Julie loved this movie", a:"what did julie love?"},
+ {s:"Sarah called Tom", a:"who did sarah call?"},
+ {s:"Mark visited Paris", a:"where did mark visit?"},
+ {s:"They bought a car", a:"what did they buy?"},
+ {s:"Paul reads books", a:"what does paul read?"},
+ {s:"Emma drinks coffee", a:"what does emma drink?"},
+ {s:"The dog eats meat", a:"what does the dog eat?"},
+ {s:"The teacher helps students", a:"who does the teacher help?"},
+ {s:"They watch movies", a:"what do they watch?"},
+ {s:"Lucas played guitar", a:"what did lucas play?"},
+ {s:"She opened the door", a:"what did she open?"},
+ {s:"They met John", a:"who did they meet?"},
+ {s:"Anna visited London", a:"where did anna visit?"},
+ {s:"He finished the project", a:"what did he finish?"},
+ {s:"We cleaned the house", a:"what did we clean?"},
+ {s:"The cat caught a mouse", a:"what did the cat catch?"},
+ {s:"She invited Marie", a:"who did she invite?"},
+ {s:"They built a bridge", a:"what did they build?"},
+ {s:"He wrote a letter", a:"what did he write?"},
+ {s:"Julie sends emails", a:"what does julie send?"},
+ {s:"They sell cars", a:"what do they sell?"},
+ {s:"Tom fixed the bike", a:"what did tom fix?"},
+ {s:"She found the keys", a:"what did she find?"},
+ {s:"They chose a restaurant", a:"what did they choose?"},
+ {s:"He teaches English", a:"what does he teach?"},
+ {s:"We visited a museum", a:"what did we visit?"}
+];
+
+let current, good=0, total=0, answered=false;
+
+function normalize(x){
+ return x.toLowerCase().trim().replace(/\s+/g," ");
+}
+
+function nextQ(){
+ current = data[Math.floor(Math.random()*data.length)];
+ document.getElementById("sentence").textContent = current.s;
+ const inp=document.getElementById("answer");
+ inp.value="";
+ inp.disabled=false;
+ inp.className="";
+ document.getElementById("result").innerHTML="";
+ inp.focus();
+ answered=false;
+}
+
+function check(){
+ if(answered){ nextQ(); return; }
+
+ const inp=document.getElementById("answer");
+ const user=normalize(inp.value);
+ const goodAns=normalize(current.a);
+
+ total++;
+
+ if(user===goodAns){
+   good++;
+   inp.classList.add("correct");
+   document.getElementById("result").innerHTML =
+     `<div class="result correctBox">✅ Correct !</div>`;
+ } else {
+   inp.classList.add("incorrect");
+   document.getElementById("result").innerHTML =
+     `<div class="result incorrectBox">❌ Incorrect
+        <div class="correction">Réponse : ${current.a}</div>
+      </div>`;
+ }
+
+ document.getElementById("good").textContent=good;
+ document.getElementById("total").textContent=total;
+
+ inp.disabled=true;
+ answered=true;
+}
+
+document.addEventListener("keydown", e=>{
+ if(e.key==="Enter") check();
+});
+
+nextQ();
+</script>
+
+</html>

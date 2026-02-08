@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entraînement Anglais & France</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+ font-family:'Segoe UI',Tahoma,sans-serif;
+ background:linear-gradient(135deg,#667eea,#764ba2);
+ min-height:100vh;
+ display:flex;
+ justify-content:center;
+ align-items:flex-start;
+ padding:20px;
+}
+
+.container{
+ background:white;
+ border-radius:20px;
+ box-shadow:0 20px 60px rgba(0,0,0,.3);
+ max-width:1000px;
+ width:100%;
+ padding:50px;
+ text-align:center;
+}
+
+h1{
+ color:#667eea;
+ margin-bottom:10px;
+ font-size:2.2em;
+}
+
+.subtitle{
+ color:#666;
+ margin-bottom:40px;
+}
+
+.grid{
+ display:grid;
+ grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+ gap:30px;
+ justify-items:center;
+}
+
+.card{
+ background:#f8f9ff;
+ border:2px solid #e0e7ff;
+ border-radius:18px;
+ padding:35px;
+ transition:.25s;
+ cursor:pointer;
+ position:relative;
+}
+
+.card:hover{
+ transform:translateY(-6px);
+ box-shadow:0 15px 35px rgba(0,0,0,.15);
+}
+
+.icon{
+ font-size:3em;
+ margin-bottom:15px;
+}
+
+.card h2{
+ color:#764ba2;
+ margin-bottom:10px;
+}
+
+.card p{
+ color:#666;
+ margin-bottom:20px;
+}
+
+.btn{
+ display:inline-block;
+ padding:12px 18px;
+ border-radius:10px;
+ background:linear-gradient(135deg,#667eea,#764ba2);
+ color:white;
+ text-decoration:none;
+ font-weight:bold;
+}
+
+.pdf-link{
+ display:block;
+ margin-top:10px;
+ font-size:0.9em;
+ color:#667eea;
+ text-decoration:underline;
+}
+
+.footer{
+ margin-top:30px;
+ color:#888;
+ font-size:.9em;
+}
+
+@media(max-width:700px){
+ .grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>📚 Entraînement Anglais & France</h1>
+  <div class="subtitle">Choisis ton mode d’entraînement</div>
+
+  <div class="grid">
+
+    <!-- Verbes irréguliers -->
+    <div class="card" onclick="go('verbe.html')">
+      <div class="icon">🔤</div>
+      <h2>Verbes Irréguliers</h2>
+      <p>Apprentissage intelligent avec correction automatique et score.</p>
+      <a class="btn">S'entraîner</a>
+    </div>
+
+    <!-- Object Questions -->
+    <div class="card" onclick="go('object.html')">
+      <div class="icon">❓</div>
+      <h2>Object Questions</h2>
+      <p>Transformer des phrases en questions — présent & passé.</p>
+      <a class="btn">S'entraîner</a>
+    </div>
+
+    <!-- Régions France -->
+    <div class="card" onclick="go('regions.html')">
+      <div class="icon">🗺️</div>
+      <h2>Régions France</h2>
+      <p>Identifier toutes les régions sur une carte muette.</p>
+      <a class="btn">S'entraîner</a>
+    </div>
+
+    <!-- Fleuves France -->
+    <div class="card" onclick="go('fleuves.html')">
+      <div class="icon">🌊</div>
+      <h2>Fleuves France</h2>
+      <p>Repérer les principaux fleuves sur une carte muette.</p>
+      <a class="btn">S'entraîner</a>
+    </div>
+
+    <!-- Relief / Montagnes France -->
+    <div class="card" onclick="go('relief.html')">
+      <div class="icon">⛰️</div>
+      <h2>Relief France</h2>
+      <p>Identifier les chaînes de montagnes et massifs principaux.</p>
+      <a class="btn">S'entraîner</a>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    Mode révision rapide — style contrôle
+  </div>
+</div>
+
+<script>
+function go(page){
+ window.location.href = page;
+}
+</script>
+
+</body>
+</html>

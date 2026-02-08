@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entraînement Verbes Irréguliers - Intelligent</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+        h1 { text-align: center; color: #667eea; margin-bottom: 10px; font-size: 2em; }
+        .score { text-align: center; color: #666; margin-bottom: 30px; font-size: 1.1em; }
+        .score span { font-weight: bold; color: #667eea; }
+        .question-card {
+            background: #f8f9ff;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 25px;
+            border: 2px solid #e0e7ff;
+        }
+        .french-verb {
+            text-align: center;
+            font-size: 2.5em;
+            color: #764ba2;
+            font-weight: bold;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 8px; color: #555; font-weight: 600; font-size: 0.95em; }
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e7ff;
+            border-radius: 10px;
+            font-size: 1.1em;
+            transition: all 0.3s;
+            font-family: monospace;
+        }
+        input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
+        input.correct { border-color: #10b981; background-color: #ecfdf5; }
+        input.incorrect { border-color: #ef4444; background-color: #fef2f2; }
+        .correction { background: #fef2f2; border: 2px solid #ef4444; border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+        .correction h3 { color: #ef4444; margin-bottom: 15px; font-size: 1.2em; }
+        .correction-item { margin-bottom: 10px; padding: 8px; background: white; border-radius: 5px; }
+        .correction-item strong { color: #764ba2; }
+        .correction-item .wrong { color: #ef4444; text-decoration: line-through; }
+        .correction-item .right { color: #10b981; font-weight: bold; }
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4); }
+        .result { text-align: center; font-size: 1.1em; margin-bottom: 20px; padding: 15px; border-radius: 10px; font-weight: bold; }
+        .result.correct { background: #ecfdf5; color: #10b981; }
+        .result.incorrect { background: #fef2f2; color: #ef4444; }
+        @media (max-width: 600px) { .container { padding: 25px; } h1 { font-size: 1.5em; } .french-verb { font-size: 2em; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Apprentissage Intelligent</h1>
+        <div class="score">Score session : <span id="correct">0</span> / <span id="total">0</span></div>
+        <div id="quiz-area">
+            <div class="question-card">
+                <div class="french-verb" id="french-verb"></div>
+                <div class="input-group"><label for="base">Base verbale :</label><input type="text" id="base" autocomplete="off"></div>
+                <div class="input-group"><label for="preterit">Prétérit :</label><input type="text" id="preterit" autocomplete="off"></div>
+                <div class="input-group"><label for="participe">Participe passé :</label><input type="text" id="participe" autocomplete="off"></div>
+            </div>
+            <div id="result-area"></div>
+            <button id="submit-btn" onclick="checkAnswer()">Vérifier</button>
+        </div>
+    </div>
+    <script>
+        const verbs = [
+            {base: "be", preterit: "was/were", participe: "been", french: "être"},
+            {base: "bear", preterit: "bore", participe: "borne", french: "porter, supporter"},
+            {base: "beat", preterit: "beat", participe: "beaten", french: "battre"},
+            {base: "become", preterit: "became", participe: "become", french: "devenir"},
+            {base: "begin", preterit: "began", participe: "begun", french: "commencer"},
+            {base: "bend", preterit: "bent", participe: "bent", french: "(se) courber"},
+            {base: "bet", preterit: "bet", participe: "bet", french: "parier"},
+            {base: "bite", preterit: "bit", participe: "bitten", french: "mordre"},
+            {base: "bleed", preterit: "bled", participe: "bled", french: "saigner"},
+            {base: "blow", preterit: "blew", participe: "blown", french: "souffler"},
+            {base: "break", preterit: "broke", participe: "broken", french: "casser"},
+            {base: "bring", preterit: "brought", participe: "brought", french: "apporter"},
+            {base: "build", preterit: "built", participe: "built", french: "construire"},
+            {base: "burn", preterit: "burnt", participe: "burnt", french: "brûler"},
+            {base: "burst", preterit: "burst", participe: "burst", french: "éclater"},
+            {base: "buy", preterit: "bought", participe: "bought", french: "acheter"},
+            {base: "cast", preterit: "cast", participe: "cast", french: "jeter, lancer"},
+            {base: "catch", preterit: "caught", participe: "caught", french: "attraper"},
+            {base: "choose", preterit: "chose", participe: "chosen", french: "choisir"},
+            {base: "cling", preterit: "clung", participe: "clung", french: "s'accrocher"},
+            {base: "come", preterit: "came", participe: "come", french: "venir"},
+            {base: "cost", preterit: "cost", participe: "cost", french: "coûter"},
+            {base: "cut", preterit: "cut", participe: "cut", french: "couper"},
+            {base: "deal", preterit: "dealt", participe: "dealt", french: "distribuer"},
+            {base: "dig", preterit: "dug", participe: "dug", french: "creuser"},
+            {base: "do", preterit: "did", participe: "done", french: "faire"},
+            {base: "draw", preterit: "drew", participe: "drawn", french: "dessiner"},
+            {base: "dream", preterit: "dreamt", participe: "dreamt", french: "rêver"},
+            {base: "drink", preterit: "drank", participe: "drunk", french: "boire"},
+            {base: "drive", preterit: "drove", participe: "driven", french: "conduire"},
+            {base: "dwell", preterit: "dwelt", participe: "dwelt", french: "habiter, résider"},
+            {base: "eat", preterit: "ate", participe: "eaten", french: "manger"},
+            {base: "fall", preterit: "fell", participe: "fallen", french: "tomber"},
+            {base: "feed", preterit: "fed", participe: "fed", french: "nourrir"},
+            {base: "feel", preterit: "felt", participe: "felt", french: "sentir, envoyer"},
+            {base: "fight", preterit: "fought", participe: "fought", french: "se battre"},
+            {base: "find", preterit: "found", participe: "found", french: "trouver"},
+            {base: "flee", preterit: "fled", participe: "fled", french: "fuir"},
+            {base: "fly", preterit: "flew", participe: "flown", french: "voler"},
+            {base: "forbid", preterit: "forbade", participe: "forbidden", french: "interdire"},
+            {base: "forget", preterit: "forgot", participe: "forgotten", french: "oublier"},
+            {base: "forgive", preterit: "forgave", participe: "forgiven", french: "pardonner"},
+            {base: "freeze", preterit: "froze", participe: "frozen", french: "geler"},
+            {base: "get", preterit: "got", participe: "got", french: "obtenir"},
+            {base: "give", preterit: "gave", participe: "given", french: "donner"},
+            {base: "go", preterit: "went", participe: "gone", french: "aller"},
+            {base: "grow", preterit: "grew", participe: "grown", french: "grandir"},
+            {base: "hang", preterit: "hung", participe: "hung", french: "pendre"},
+            {base: "have", preterit: "had", participe: "had", french: "avoir"},
+            {base: "hear", preterit: "heard", participe: "heard", french: "entendre"},
+            {base: "hide", preterit: "hid", participe: "hidden", french: "cacher"},
+            {base: "hit", preterit: "hit", participe: "hit", french: "frapper"},
+            {base: "hold", preterit: "held", participe: "held", french: "tenir"},
+            {base: "hurt", preterit: "hurt", participe: "hurt", french: "blesser"},
+            {base: "keep", preterit: "kept", participe: "kept", french: "garder"},
+            {base: "know", preterit: "knew", participe: "known", french: "savoir"},
+            {base: "lay", preterit: "laid", participe: "laid", french: "poser"},
+            {base: "lead", preterit: "led", participe: "led", french: "mener"},
+            {base: "learn", preterit: "learnt", participe: "learnt", french: "apprendre"},
+            {base: "leave", preterit: "left", participe: "left", french: "quitter"},
+            {base: "lend", preterit: "lent", participe: "lent", french: "prêter"},
+            {base: "let", preterit: "let", participe: "let", french: "laisser"},
+            {base: "lie", preterit: "lay", participe: "lain", french: "être étendu"},
+            {base: "light", preterit: "lit", participe: "lit", french: "allumer"},
+            {base: "lose", preterit: "lost", participe: "lost", french: "perdre"},
+            {base: "make", preterit: "made", participe: "made", french: "faire"},
+            {base: "mean", preterit: "meant", participe: "meant", french: "signifier"},
+            {base: "meet", preterit: "met", participe: "met", french: "rencontrer"},
+            {base: "pay", preterit: "paid", participe: "paid", french: "payer"},
+            {base: "put", preterit: "put", participe: "put", french: "mettre"},
+            {base: "read", preterit: "read", participe: "read", french: "lire"},
+            {base: "ride", preterit: "rode", participe: "ridden", french: "chevaucher"},
+            {base: "ring", preterit: "rang", participe: "rung", french: "sonner"},
+            {base: "rise", preterit: "rose", participe: "risen", french: "se lever"},
+            {base: "run", preterit: "ran", participe: "run", french: "courir"},
+            {base: "say", preterit: "said", participe: "said", french: "dire"},
+            {base: "see", preterit: "saw", participe: "seen", french: "voir"},
+            {base: "sell", preterit: "sold", participe: "sold", french: "vendre"},
+            {base: "send", preterit: "sent", participe: "sent", french: "envoyer"},
+            {base: "shake", preterit: "shook", participe: "shaken", french: "secouer"},
+            {base: "shine", preterit: "shone", participe: "shone", french: "briller"},
+            {base: "shoot", preterit: "shot", participe: "shot", french: "tirer"},
+            {base: "show", preterit: "showed", participe: "shown", french: "montrer"},
+            {base: "shut", preterit: "shut", participe: "shut", french: "fermer"},
+            {base: "sing", preterit: "sang", participe: "sung", french: "chanter"},
+            {base: "sink", preterit: "sank", participe: "sunk", french: "couler"},
+            {base: "sit", preterit: "sat", participe: "sat", french: "être assis"},
+            {base: "sleep", preterit: "slept", participe: "slept", french: "dormir"},
+            {base: "speak", preterit: "spoke", participe: "spoken", french: "parler"},
+            {base: "spend", preterit: "spent", participe: "spent", french: "dépenser/passer du temps"},
+            {base: "stand", preterit: "stood", participe: "stood", french: "être debout"},
+            {base: "steal", preterit: "stole", participe: "stolen", french: "voler"},
+            {base: "swim", preterit: "swam", participe: "swum", french: "nager"},
+            {base: "take", preterit: "took", participe: "taken", french: "prendre"},
+            {base: "teach", preterit: "taught", participe: "taught", french: "enseigner"},
+            {base: "tell", preterit: "told", participe: "told", french: "dire/raconter"},
+            {base: "think", preterit: "thought", participe: "thought", french: "penser"},
+            {base: "throw", preterit: "threw", participe: "thrown", french: "jeter"},
+            {base: "understand", preterit: "understood", participe: "understood", french: "comprendre"},
+            {base: "wake", preterit: "woke", participe: "woken", french: "se réveiller"},
+            {base: "wear", preterit: "wore", participe: "worn", french: "porter"},
+            {base: "win", preterit: "won", participe: "won", french: "gagner"},
+            {base: "write", preterit: "wrote", participe: "written", french: "écrire"}
+        ];
+
+        let verbWeights = JSON.parse(localStorage.getItem('verbWeights')) || {};
+        verbs.forEach((_, index) => { if (verbWeights[index] === undefined) verbWeights[index] = 1.0; });
+
+        let currentVerb, currentVerbIndex, correctCount = 0, totalCount = 0, answered = false;
+
+        function normalize(str) { return str.toLowerCase().trim().replace(/\s+/g, ' '); }
+        function checkVariants(userAnswer, correctAnswer) {
+            const userNorm = normalize(userAnswer);
+            return correctAnswer.split('/').map(v => normalize(v)).some(variant => userNorm === variant);
+        }
+
+        function loadNewVerb() {
+            let totalWeight = Object.values(verbWeights).reduce((a, b) => a + b, 0);
+            let random = Math.random() * totalWeight, sum = 0;
+            for (let i = 0; i < verbs.length; i++) {
+                sum += verbWeights[i];
+                if (random <= sum) { currentVerbIndex = i; currentVerb = verbs[i]; break; }
+            }
+            document.getElementById('french-verb').textContent = currentVerb.french;
+            document.getElementById('base').value = '';
+            document.getElementById('preterit').value = '';
+            document.getElementById('participe').value = '';
+            document.getElementById('result-area').innerHTML = '';
+            document.getElementById('submit-btn').textContent = 'Vérifier';
+            answered = false;
+            ['base', 'preterit', 'participe'].forEach(id => {
+                const input = document.getElementById(id);
+                input.classList.remove('correct', 'incorrect');
+                input.disabled = false;
+            });
+            document.getElementById('base').focus();
+        }
+
+        function checkAnswer() {
+            if (answered) { loadNewVerb(); return; }
+            const uB = document.getElementById('base').value, uPr = document.getElementById('preterit').value, uPa = document.getElementById('participe').value;
+            const bC = checkVariants(uB, currentVerb.base), prC = checkVariants(uPr, currentVerb.preterit), paC = checkVariants(uPa, currentVerb.participe);
+            const allCorrect = bC && prC && paC;
+            totalCount++;
+            if (allCorrect) { correctCount++; verbWeights[currentVerbIndex] = Math.max(0.1, verbWeights[currentVerbIndex] * 0.5); }
+            else { verbWeights[currentVerbIndex] += 2.5; }
+            localStorage.setItem('verbWeights', JSON.stringify(verbWeights));
+            document.getElementById('correct').textContent = correctCount;
+            document.getElementById('total').textContent = totalCount;
+            document.getElementById('base').classList.add(bC ? 'correct' : 'incorrect');
+            document.getElementById('preterit').classList.add(prC ? 'correct' : 'incorrect');
+            document.getElementById('participe').classList.add(paC ? 'correct' : 'incorrect');
+            ['base', 'preterit', 'participe'].forEach(id => document.getElementById(id).disabled = true);
+            let res = allCorrect ? '<div class="result correct">✅ Parfait !</div>' : `<div class="result incorrect">❌ Appris ! Reviendra bientôt.</div><div class="correction"><h3>Correction :</h3><div class="correction-item"><strong>Base :</strong> ${currentVerb.base}</div><div class="correction-item"><strong>Prétérit :</strong> ${currentVerb.preterit}</div><div class="correction-item"><strong>Participe :</strong> ${currentVerb.participe}</div></div>`;
+            document.getElementById('result-area').innerHTML = res;
+            document.getElementById('submit-btn').textContent = 'Suivant';
+            answered = true;
+        }
+
+        document.addEventListener('keypress', e => { if (e.key === 'Enter') checkAnswer(); });
+        loadNewVerb();
+    </script>
+</body>
+</html>"""
+

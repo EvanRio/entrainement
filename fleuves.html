@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fleuves de France - Entraînement</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+ font-family:'Segoe UI',Tahoma,sans-serif;
+ background:linear-gradient(135deg,#667eea,#764ba2);
+ min-height:100vh;
+ display:flex;
+ justify-content:center;
+ align-items:center;
+ padding:20px;
+}
+.container{
+ background:white;
+ border-radius:20px;
+ box-shadow:0 20px 60px rgba(0,0,0,.3);
+ max-width:700px;
+ width:100%;
+ padding:40px;
+ text-align:center;
+}
+h1{
+ color:#667eea;
+ margin-bottom:10px;
+ font-size:2em;
+}
+.score{
+ color:#666;
+ margin-bottom:25px;
+}
+.score span{
+ font-weight:bold;
+ color:#667eea;
+}
+.card{
+ background:#f8f9ff;
+ border-radius:15px;
+ padding:30px;
+ border:2px solid #e0e7ff;
+ margin-bottom:20px;
+}
+.region-img{
+ max-width:100%;
+ border:2px solid #e0e7ff;
+ border-radius:10px;
+ margin-bottom:20px;
+}
+input{
+ width:100%;
+ padding:12px;
+ border:2px solid #e0e7ff;
+ border-radius:10px;
+ font-size:1.1em;
+ font-family:monospace;
+}
+input:focus{outline:none;border-color:#667eea;}
+input.correct{border-color:#10b981;background:#ecfdf5;}
+input.incorrect{border-color:#ef4444;background:#fef2f2;}
+button{
+ width:100%;
+ padding:14px;
+ background:linear-gradient(135deg,#667eea,#764ba2);
+ color:white;
+ border:none;
+ border-radius:10px;
+ font-size:1.1em;
+ font-weight:bold;
+ cursor:pointer;
+ margin-top:15px;
+}
+button:hover{
+ transform:translateY(-2px);
+ box-shadow:0 5px 20px rgba(102,126,234,.4);
+}
+.result{
+ margin-top:15px;
+ padding:15px;
+ border-radius:10px;
+ font-weight:bold;
+ text-align:center;
+}
+.correctBox{background:#ecfdf5;color:#10b981;}
+.incorrectBox{background:#fef2f2;color:#ef4444;}
+.correction{margin-top:10px;font-weight:normal;}
+</style>
+</head>
+<body>
+<div class="container">
+ <h1>🌊 Fleuves de France</h1>
+ <div class="score">Score : <span id="good">0</span> / <span id="total">0</span></div>
+
+ <div class="card">
+   <img id="fleuveImg" class="region-img" src="" alt="Fleuve">
+   <input id="answer" placeholder="Tape le nom du fleuve…">
+   <button onclick="check()">Vérifier</button>
+   <div id="result"></div>
+ </div>
+</div>
+
+<script>
+// Liste des fleuves et image correspondante
+const fleuves = [
+ {name:"Loire", img:"images/loire.png"},
+ {name:"Seine", img:"images/seine.png"},
+ {name:"Garonne", img:"images/garonne.png"},
+ {name:"Rhône", img:"images/rhone.png"},
+ {name:"Meuse", img:"images/meuse.png"},
+ {name:"Rhin", img:"images/rhin.png"},
+ {name:"Dordogne", img:"images/dordogne.png"},
+];
+
+let current, good=0, total=0, answered=false;
+
+function nextQ(){
+ current = fleuves[Math.floor(Math.random()*fleuves.length)];
+ document.getElementById("fleuveImg").src = current.img;
+ const inp=document.getElementById("answer");
+ inp.value="";
+ inp.disabled=false;
+ inp.className="";
+ document.getElementById("result").innerHTML="";
+ inp.focus();
+ answered=false;
+}
+
+function normalize(x){ return x.toLowerCase().trim().replace(/\s+/g," "); }
+
+function check(){
+ if(answered){ nextQ(); return; }
+ const inp=document.getElementById("answer");
+ const user = normalize(inp.value);
+ const correct = normalize(current.name);
+ total++;
+ if(user === correct){
+   good++;
+   inp.classList.add("correct");
+   document.getElementById("result").innerHTML = `<div class="result correctBox">✅ Correct !</div>`;
+ } else {
+   inp.classList.add("incorrect");
+   document.getElementById("result").innerHTML = `<div class="result incorrectBox">❌ Incorrect !<div class="correction">Réponse : ${current.name}</div></div>`;
+ }
+ document.getElementById("good").textContent = good;
+ document.getElementById("total").textContent = total;
+ inp.disabled=true;
+ answered=true;
+}
+
+document.addEventListener("keydown", e => { if(e.key === "Enter") check(); });
+nextQ();
+</script>
+</body>
+</html>
